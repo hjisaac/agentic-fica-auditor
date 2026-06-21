@@ -1,0 +1,30 @@
+[
+  {
+    "registration_number": "2021/100200/07",
+    "name": "Apex Tech Solutions (Pty) Ltd",
+    "status": "Active",
+    "registration_date": "2021-04-12",
+    "directors_json": [
+      {"id_number": "9001015000081", "first_names": "Sipho", "last_name": "Maseko", "role": "Director", "ownership_percentage": 60},
+      {"id_number": "8507155123084", "first_names": "Shereen", "last_name": "Naidoo", "role": "Director", "ownership_percentage": 40}
+    ]
+  },
+  {
+    "registration_number": "2018/345678/07",
+    "name": "Vanguard Enterprises (Pty) Ltd",
+    "status": "Active",
+    "registration_date": "2018-09-05",
+    "directors_json": [
+      {"id_number": "7811226001089", "first_names": "Johan", "last_name": "Pretorius", "role": "Managing Director", "ownership_percentage": 100}
+    ]
+  },
+  {
+    "registration_number": "2020/999999/07",
+    "name": "Shadow Logistics (Pty) Ltd",
+    "status": "Under Liquidation",
+    "registration_date": "2020-01-15",
+    "directors_json": [
+      {"id_number": "6001015000080", "first_names": "Victor", "last_name": "Sanctioned", "role": "Director", "ownership_percentage": 100}
+    ]
+  }
+]

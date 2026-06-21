@@ -1,0 +1,17 @@
+[project]
+name = "fc-agent"
+version = "1.0.0"
+description = "FICA KYC and KYB compliance AI agent demonstration for Fraudcheck."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "Flask>=3.0.2",
+    "peewee>=4.1.0",
+    "fastapi>=0.115.8",
+    "uvicorn>=0.34.0",
+    "google-genai>=0.1.1",
+    "python-dotenv>=1.2.2",
+]
+
+[tool.uv]
+dev-dependencies = []

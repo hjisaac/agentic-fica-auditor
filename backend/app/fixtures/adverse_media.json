@@ -1,0 +1,34 @@
+[
+  {
+    "id": "AM-1",
+    "target_name": "Johan Pretorius",
+    "title": "Vanguard Director Linked to Procurement Investigation",
+    "snippet": "Cape Town News - The Special Investigating Unit (SIU) is investigating Johan Pretorius, director of Vanguard Enterprises, in connection with allegations of collusive bidding on a public works department tender worth R45 million. Pretorius has denied any wrongdoing, stating that the bids complied with all procurement regulations.",
+    "source": "Cape Town News",
+    "severity": "Medium"
+  },
+  {
+    "id": "AM-2",
+    "target_name": "Victor Sanctioned",
+    "title": "Assets Frozen in Multi-Million Dollar Laundering Probe",
+    "snippet": "Daily Finance - The Assets Forfeiture Unit has obtained a preservation order to freeze bank accounts and properties linked to businessman Victor Sanctioned. Authorities allege that Sanctioned was a key facilitator in laundering millions of rands obtained through illegal state contracts and transferring funds offshore to tax havens.",
+    "source": "Daily Finance",
+    "severity": "High"
+  },
+  {
+    "id": "AM-3",
+    "target_name": "Shadow Logistics (Pty) Ltd",
+    "title": "Logistics Firm Accused of Port Smuggling Operations",
+    "snippet": "Maritime Weekly - Shadow Logistics (Pty) Ltd is facing suspension of its customs license after SARS discovered undeclared high-value electronics inside a shipment marked as agricultural equipment at Durban Port. Investigators are probing whether this was part of a larger syndicate run by the company's directors.",
+    "source": "Maritime Weekly",
+    "severity": "High"
+  },
+  {
+    "id": "AM-4",
+    "target_name": "Sipho Maseko",
+    "title": "Sipho Maseko Appointed to Lead Renewable Energy Task Force",
+    "snippet": "Business Report - Industry veteran Sipho Maseko has been appointed as chairperson of the national renewable energy transition task force. Maseko, who has served on several corporate boards, was praised for his clean governance track record and extensive experience in the energy sector.",
+    "source": "Business Report",
+    "severity": "None"
+  }
+]

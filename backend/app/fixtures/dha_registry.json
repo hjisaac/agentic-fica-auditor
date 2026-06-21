@@ -1,0 +1,47 @@
+[
+  {
+    "id_number": "9001015000081",
+    "first_names": "Sipho",
+    "last_name": "Maseko",
+    "dob": "1990-01-01",
+    "gender": "Male",
+    "status": "Alive",
+    "citizen_status": "South African Citizen"
+  },
+  {
+    "id_number": "8507155123084",
+    "first_names": "Shereen",
+    "last_name": "Naidoo",
+    "dob": "1985-07-15",
+    "gender": "Female",
+    "status": "Alive",
+    "citizen_status": "South African Citizen"
+  },
+  {
+    "id_number": "7811226001089",
+    "first_names": "Johan",
+    "last_name": "Pretorius",
+    "dob": "1978-11-22",
+    "gender": "Male",
+    "status": "Alive",
+    "citizen_status": "South African Citizen"
+  },
+  {
+    "id_number": "9503120123087",
+    "first_names": "Kagiso",
+    "last_name": "Modise",
+    "dob": "1995-03-12",
+    "gender": "Female",
+    "status": "Alive",
+    "citizen_status": "South African Citizen"
+  },
+  {
+    "id_number": "6001015000080",
+    "first_names": "Victor",
+    "last_name": "Sanctioned",
+    "dob": "1960-01-01",
+    "gender": "Male",
+    "status": "Alive",
+    "citizen_status": "South African Citizen"
+  }
+]

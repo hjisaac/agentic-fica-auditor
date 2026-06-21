@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: fc-fica-compliance-agent
+    env: docker
+    dockerFilePath: Dockerfile
+    plan: free
+    healthCheckPath: /api/cases

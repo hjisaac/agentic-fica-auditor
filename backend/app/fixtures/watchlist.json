@@ -1,0 +1,18 @@
+[
+  {
+    "id": "WL-1",
+    "name": "Victor Sanctioned",
+    "type": "Sanctioned Entity",
+    "list_name": "OFAC Sanctions List",
+    "reason": "Associated with illicit financial networks.",
+    "risk_level": "High"
+  },
+  {
+    "id": "WL-2",
+    "name": "Sipho Maseko",
+    "type": "Politically Exposed Person (PEP)",
+    "list_name": "South African National PEP Database",
+    "reason": "Relative of a high-ranking government official in procurement.",
+    "risk_level": "Medium"
+  }
+]
