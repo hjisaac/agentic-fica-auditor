@@ -296,15 +296,15 @@ export const ComplianceGraph: React.FC<ComplianceGraphProps> = ({
             const getStatusColor = (chkStatus: CheckStatus['status']) => {
               switch (chkStatus) {
                 case 'SUCCESS':
-                  return 'border-emerald-250 bg-emerald-50/70 text-emerald-700';
+                  return 'border-emerald-200 bg-emerald-50/70 text-emerald-700';
                 case 'WARNING':
-                  return 'border-amber-250 bg-amber-50/70 text-amber-700';
+                  return 'border-amber-200 bg-amber-50/70 text-amber-700';
                 case 'FAILED':
-                  return 'border-red-250 bg-red-50/70 text-red-700';
+                  return 'border-red-200 bg-red-50/70 text-red-700';
                 case 'NA':
                   return 'border-slate-200 bg-slate-100/50 text-slate-400';
                 default:
-                  return 'border-slate-250 bg-slate-50 text-slate-500 animate-pulse';
+                  return 'border-slate-200 bg-slate-50 text-slate-500 animate-pulse';
               }
             };
             

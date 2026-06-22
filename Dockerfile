@@ -4,16 +4,19 @@
 FROM node:22-slim AS frontend-builder
 WORKDIR /frontend
 
-# Copy frontend source files
-COPY frontend/package.json frontend/package-lock.json* ./
+# Install pnpm globally
+RUN npm install -g pnpm
+
+# Copy frontend source files (including pnpm-lock.yaml)
+COPY frontend/package.json frontend/pnpm-lock.yaml ./
 COPY frontend/tsconfig.json frontend/vite.config.ts ./
 COPY frontend/tailwind.config.js frontend/postcss.config.js ./
 COPY frontend/index.html ./
 COPY frontend/src ./src
 
-# Install dependencies and build production assets
-RUN npm install
-RUN npm run build
+# Install dependencies using pnpm and build production assets
+RUN pnpm install --frozen-lockfile
+RUN pnpm run build
 
 # ==========================================
 # STAGE 2: Build the Python FastAPI Backend

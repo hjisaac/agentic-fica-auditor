@@ -59,46 +59,125 @@ def save_case_to_db(outcome: dict, traces: list) -> dict:
     )
     return outcome
 
+# Run a one-time ping check on startup
+IS_GEMINI_KEY_VALID = False
+
+def check_gemini_key():
+    global IS_GEMINI_KEY_VALID
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key or "your-gemini-api-key" in api_key:
+        logger.warning("No Gemini API key provided. Falling back to offline/mock mode.")
+        IS_GEMINI_KEY_VALID = False
+        return
+
+    if not HAS_GEMINI:
+        logger.warning("Google GenAI SDK is not installed. Falling back to offline/mock mode.")
+        IS_GEMINI_KEY_VALID = False
+        return
+
+    try:
+        logger.info("Verifying Gemini API key by listing models (metadata ping)...")
+        client = genai.Client(api_key=api_key)
+        # Query models metadata endpoint (GET request) to list available models,
+        # which validates the key without consuming any tokens.
+        client.models.list()
+        logger.info("Gemini API key verified successfully. Live Mode is ACTIVE.")
+        IS_GEMINI_KEY_VALID = True
+    except Exception as e:
+        logger.error(f"Gemini API key verification failed: {str(e)}. Falling back to mock mode.")
+        IS_GEMINI_KEY_VALID = False
+
+check_gemini_key()
+
 class ComplianceAgentEngine:
     """
     Orchestrates compliance checks using the custom ReAct agent reasoning pattern.
-    If GEMINI_API_KEY is present, runs live function-calling loops using Gemini SDK.
+    If GEMINI_API_KEY is present and verified, runs live function-calling loops using Gemini SDK.
     Otherwise, falls back to deterministic local mock verification traces.
     """
     def __init__(self):
-        self.api_key = os.environ.get("GEMINI_API_KEY")
-        
-        has_valid_key = (
-            self.api_key is not None 
-            and len(self.api_key.strip()) > 0 
-            and "your-gemini-api-key" not in self.api_key
-        )
-        
-        self.live_mode = HAS_GEMINI and has_valid_key
-        
-        if self.live_mode:
-            logger.info("Live Agent Mode enabled (utilizing live Gemini API directly).")
-            self.real_client = genai.Client(api_key=self.api_key)
-        else:
-            logger.info("Offline/Mock Agent Mode enabled.")
+        pass
+
+    def _is_live_configured(self) -> bool:
+        return IS_GEMINI_KEY_VALID
 
     def verify_individual(self, first_names: str, last_name: str, id_number: str, account_number: str = None, bank_name: str = None, parent_case_id: str = None) -> dict:
         full_name = f"{first_names} {last_name}"
         
-        if self.live_mode:
+        if self._is_live_configured():
             try:
-                return self._verify_individual_client(self.real_client, first_names, last_name, id_number, account_number, bank_name, parent_case_id)
+                client = genai.Client()
+                return self._verify_individual_client(client, first_names, last_name, id_number, account_number, bank_name, parent_case_id)
             except Exception as e:
-                logger.exception(f"Live verification failed for {full_name}, falling back to mock.")
+                logger.exception(f"Live verification failed for {full_name}, falling back to mock with warning.")
+                outcome = self._verify_individual_mock(first_names, last_name, id_number, account_number, bank_name, parent_case_id)
+                
+                try:
+                    traces = json.loads(outcome["traces_json"])
+                except Exception:
+                    traces = []
+                
+                error_msg = str(e)
+                if "429" in error_msg or "quota" in error_msg.lower() or "exhausted" in error_msg.lower():
+                    friendly_error = "RESOURCE_EXHAUSTED (Quota Exceeded / Rate Limited). Please check your plan/billing details or try again later."
+                else:
+                    friendly_error = error_msg
+                
+                warning_trace = {
+                    "step_index": 0,
+                    "type": "OBSERVATION",
+                    "name": "Live Connection Warning",
+                    "timestamp": datetime.datetime.now().isoformat(),
+                    "content": f"[API WARNING] Live Gemini verification failed: {friendly_error}\n\nFalling back to a local compliance sandbox verification cassette (mock data) to prevent disruption.",
+                    "is_clean": True
+                }
+                
+                traces = [warning_trace] + traces
+                for idx, t in enumerate(traces):
+                    t["step_index"] = idx
+                
+                outcome["traces_json"] = json.dumps(traces)
+                Case.update(traces_json=outcome["traces_json"]).where(Case.id == outcome["id"]).execute()
+                return outcome
                 
         return self._verify_individual_mock(first_names, last_name, id_number, account_number, bank_name, parent_case_id)
 
     def verify_business(self, company_name: str, registration_number: str) -> dict:
-        if self.live_mode:
+        if self._is_live_configured():
             try:
-                return self._verify_business_client(self.real_client, company_name, registration_number)
+                client = genai.Client()
+                return self._verify_business_client(client, company_name, registration_number)
             except Exception as e:
-                logger.exception(f"Live verification failed for {company_name}, falling back to mock.")
+                logger.exception(f"Live verification failed for {company_name}, falling back to mock with warning.")
+                outcome = self._verify_business_mock(company_name, registration_number)
+                
+                try:
+                    traces = json.loads(outcome["traces_json"])
+                except Exception:
+                    traces = []
+                
+                error_msg = str(e)
+                if "429" in error_msg or "quota" in error_msg.lower() or "exhausted" in error_msg.lower():
+                    friendly_error = "RESOURCE_EXHAUSTED (Quota Exceeded / Rate Limited). Please check your plan/billing details or try again later."
+                else:
+                    friendly_error = error_msg
+                
+                warning_trace = {
+                    "step_index": 0,
+                    "type": "OBSERVATION",
+                    "name": "Live Connection Warning",
+                    "timestamp": datetime.datetime.now().isoformat(),
+                    "content": f"[API WARNING] Live Gemini verification failed: {friendly_error}\n\nFalling back to a local compliance sandbox verification cassette (mock data) to prevent disruption.",
+                    "is_clean": True
+                }
+                
+                traces = [warning_trace] + traces
+                for idx, t in enumerate(traces):
+                    t["step_index"] = idx
+                
+                outcome["traces_json"] = json.dumps(traces)
+                Case.update(traces_json=outcome["traces_json"]).where(Case.id == outcome["id"]).execute()
+                return outcome
                 
         return self._verify_business_mock(company_name, registration_number)
 
@@ -184,6 +263,7 @@ class ComplianceAgentEngine:
             system_instruction = KYC_SYSTEM_INSTRUCTION
             user_prompt = get_kyc_user_prompt(full_name, id_number, baseline_results)
             
+            logger.info(f"Contacting Gemini API to initialize KYC chat session for {full_name}...")
             chat = client.chats.create(
                 model='gemini-2.5-flash',
                 config=types.GenerateContentConfig(
@@ -207,6 +287,7 @@ class ComplianceAgentEngine:
             
             while loop_active and iteration < max_iterations:
                 iteration += 1
+                logger.info(f"Contacting Gemini API for KYC agent reasoning iteration {iteration}...")
                 response = chat.send_message(current_prompt)
                 
                 # Parse output
@@ -254,6 +335,7 @@ class ComplianceAgentEngine:
             # Final synthesis step to enforce structured schema mapping
             decision_prompt = REACT_DECISION_PROMPT
             
+            logger.info("Contacting Gemini API for final KYC structured compliance decision...")
             decision_response = chat.send_message(
                 types.Part.from_text(text=decision_prompt)
             )
@@ -377,6 +459,7 @@ class ComplianceAgentEngine:
             system_instruction = KYB_SYSTEM_INSTRUCTION
             user_prompt = get_kyb_user_prompt(company_name, registration_number, baseline_results)
  
+            logger.info(f"Contacting Gemini API to initialize corporate KYB chat session for {company_name}...")
             chat = client.chats.create(
                 model='gemini-2.5-flash',
                 config=types.GenerateContentConfig(
@@ -399,6 +482,7 @@ class ComplianceAgentEngine:
             
             while loop_active and iteration < max_iterations:
                 iteration += 1
+                logger.info(f"Contacting Gemini API for corporate KYB agent reasoning iteration {iteration}...")
                 response = chat.send_message(current_prompt)
                 
                 thought = ""
@@ -441,6 +525,7 @@ class ComplianceAgentEngine:
             
             decision_prompt = REACT_DECISION_PROMPT
             
+            logger.info("Contacting Gemini API for final corporate KYB structured compliance decision...")
             decision_response = chat.send_message(
                 types.Part.from_text(text=decision_prompt)
             )

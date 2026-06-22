@@ -11,6 +11,12 @@ logger = logging.getLogger("fc_agent")
 router = APIRouter(prefix="/api")
 agent_engine = ComplianceAgentEngine()
 
+@router.get("/status")
+async def get_status():
+    """Retrieve backend configurations and Gemini API connection status."""
+    from backend.app.agent.engine import IS_GEMINI_KEY_VALID
+    return {"live_mode": IS_GEMINI_KEY_VALID}
+
 # Pydantic Schemas for Requests
 class KYCRequest(BaseModel):
     first_names: str
