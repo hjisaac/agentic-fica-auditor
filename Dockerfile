@@ -7,8 +7,8 @@ WORKDIR /frontend
 # Install pnpm globally
 RUN npm install -g pnpm
 
-# Copy frontend source files (including pnpm-lock.yaml)
-COPY frontend/package.json frontend/pnpm-lock.yaml ./
+# Copy frontend source files (including pnpm-lock.yaml and pnpm-workspace.yaml)
+COPY frontend/package.json frontend/pnpm-lock.yaml frontend/pnpm-workspace.yaml ./
 COPY frontend/tsconfig.json frontend/vite.config.ts ./
 COPY frontend/tailwind.config.js frontend/postcss.config.js ./
 COPY frontend/index.html ./
