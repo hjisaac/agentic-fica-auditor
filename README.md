@@ -1,4 +1,4 @@
-# FICA Compliance KYC & KYB AI Agent (Weekend Prototype)
+# FICA Compliance KYC & KYB AI Agent (~Prototype)
 
 A personal weekend project designed to demonstrate **Agentic AI patterns** in regulatory compliance checks under South Africa's **FICA (Financial Intelligence Centre Act)**. Built as a technical showcase for **Fraudcheck**.
 
