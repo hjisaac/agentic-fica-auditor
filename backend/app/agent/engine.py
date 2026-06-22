@@ -45,7 +45,7 @@ else:
         clean_steps: list = []
 
 def save_case_to_db(outcome: dict, traces: list) -> dict:
-    case_obj = Case.create(
+    Case.create(
         id=outcome["id"],
         parent_case_id=outcome.get("parent_case_id"),
         timestamp=datetime.datetime.now().isoformat(),
