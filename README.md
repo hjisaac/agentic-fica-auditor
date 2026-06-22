@@ -1,33 +1,51 @@
-# FICA Compliance KYC & KYB AI Agent Onboarding Platform
+# FICA Compliance KYC & KYB AI Agent (Weekend Prototype)
 
-An enterprise-ready AI Agent prototype designed to automate Know Your Customer (KYC) and Know Your Business (KYB) compliance checks under South Africa's **FICA (Financial Intelligence Centre Act)** regulations. Developed for **Fraudcheck**, this platform demonstrates how autonomous reasoning agents can streamline regulatory workflows while maintaining absolute auditability and strict POPIA compliance.
-
----
-
-## 🎯 The Business Goal
-
-Manual FICA verification is a major bottleneck in customer onboarding—requiring compliance officers to manually query government databases, cross-reference corporate registries, inspect shareholder lists, screen watchlists, and verify bank details. This process takes hours or days, incurs high operational costs, and leads to customer abandonment.
-
-This platform solves this by deploying a **compliance-focused AI Agent** that programmatically executes, reasons, and signs FICA audits in seconds, turning compliance into a seamless, high-velocity onboarding path.
+A personal weekend project designed to demonstrate **Agentic AI patterns** in regulatory compliance checks under South Africa's **FICA (Financial Intelligence Centre Act)**. Built as a technical showcase for **Fraudcheck**.
 
 ---
 
-## 💎 Core Value Proposition
+## 🎯 Project Goal & Context
 
-*   **Operational Efficiency**: Replaces manual multi-registry searches (DHA, CIPC) with an autonomous ReAct reasoning agent that gathers, audits, and presents decision-ready compliance briefs in real-time.
-*   **Tamper-Proof Regulatory Trail**: Every check runs in an isolated sandbox. On completion, a SHA-256 cryptographic signature is generated for the entire execution telemetry, serving as a verifiable ledger to prove zero manual manipulation or data tampering.
-*   **Recursive UBO Corporate Auditing (KYB)**: Automatically maps complex corporate structures from CIPC registries, identifies Ultimate Beneficial Owners (UBOs) and directors, and runs recursive KYC validations on all associated individuals in a single workflow.
-*   **Resiliency & High Availability**: Built with a fail-safe hybrid engine. If live AI services (Gemini API) experience rate limits (e.g., 429 quota exhaustion) or network outages, the platform gracefully falls back to local compliance sandboxes and flags the telemetry with clear system warnings, ensuring zero onboarding downtime.
-*   **POPIA & Data Privacy Compliance**: Restricts data access using ephemeral, isolated directory sandboxes (`CaseIsolationSandbox`). Files and logs are strictly partitioned to ensure compliance with South Africa’s Protection of Personal Information Act (POPIA).
+The goal of this prototype is to show how autonomous reasoning agents can streamline multi-step, complex compliance audits. 
+
+Instead of writing rigid, hardcoded scripts for compliance verification, this platform uses a **ReAct (Reasoning and Action) loop** where the agent autonomously decides what verification tools to call, inspects their results, and builds a comprehensive audit recommendation.
+
+> [!NOTE]
+> **Mocked Endpoints & Swappable Tools**: To run fully out-of-the-box without requiring restricted or expensive government API credentials, all external verification tools (DHA citizen registry, CIPC corporate business lookup, bank account verification, sanctions lists) query local, mocked databases. The tool interfaces are fully defined and can be easily replaced with live production REST API endpoints.
 
 ---
 
-## 🛠️ The Architecture & Stack
+## 🧠 Agentic Patterns Demonstrated
 
-Designed to be lightweight, secure, and easily integrated into existing enterprise stacks:
+1.  **Autonomous ReAct Loop**: The agent loops through `Thought -> Action -> Observation -> Decision` to collect audit data.
+2.  **Tool-Use Abstraction**: The agent has access to specialized tools (PEP screening, DHA checks, adverse media, CIPC lookups). If it's auditing a business (KYB), it maps the director tree from CIPC and recursively audits all directors.
+3.  **Sandbox Isolation & Verification Ledger**: Ephemeral contexts capture case execution logs and sign the final results with a **SHA-256 cryptographic hash** to prevent compliance tampering.
+4.  **Resilient Hybrid Fallback**: If live AI services (Gemini API) experience rate limits (e.g., 429 quota exhaustion) or network errors, the engine falls back to local compliance sandboxes and highlights the error in the telemetry terminal as a prominent warning alert.
 
-*   **AI Engine**: ReAct (Reasoning and Action) loop using Google Gemini models, orchestrating multiple specialized verification tools (DHA registry, CIPC corporate registries, sanctions screening, bank verification).
-*   **Backend Services**: High-performance FastAPI backend with automatic Swagger documentation.
-*   **Database**: SQLite managed via Peewee ORM for clean, secure, and transactional persistence of audit cases.
-*   **Frontend Telemetry Panel**: A responsive dashboard visualizing the live agent reasoning timeline, corporate director trees, and verifiable PDF audit report downloads.
-*   **Containerized Deployment**: Built as a standard Docker service and pre-configured for instant deployment on cloud environments (AWS, GCP, Render).
+---
+
+## 🛠️ Tech Stack
+
+*   **AI Engine**: Google Gemini API + custom ReAct reasoning parser.
+*   **Backend**: FastAPI + Uvicorn (high-performance async web server).
+*   **Database & ORM**: SQLite + Peewee ORM (Active Record pattern).
+*   **Frontend**: React + Tailwind CSS (visualizes live agent thoughts, corporate trees, and generates client-side PDF audit reports).
+*   **Deployment**: Fully containerized with a multi-stage Dockerfile and ready for one-click deployment on Render.
+
+---
+
+## 🚀 Quick Start (Local Run)
+
+The project is natively configured for **`uv`**, the modern Rust-based python package manager.
+
+```bash
+# Run backend & serve frontend
+uv run backend/run.py
+```
+This command automatically sets up the python virtual environment, installs dependencies, initializes and seeds the database, and hosts the dashboard on **http://localhost:8080**.
+
+---
+
+## 📦 Production Deployment (Render)
+
+A `render.yaml` blueprint is included. Connect this repository to your **Render.com** account, create a **Blueprint Instance**, and Render will deploy the Docker container automatically.
