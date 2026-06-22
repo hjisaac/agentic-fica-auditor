@@ -30,6 +30,7 @@ yarn-error.log*
 pnpm-debug.log*
 frontend/dist/
 frontend/node_modules/
+backend/workspace/cases/*
 
 # OS/System files
 .DS_Store

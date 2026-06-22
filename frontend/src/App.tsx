@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ShieldCheck, 
   UserCheck, 
@@ -6,20 +6,34 @@ import {
   History, 
   Cpu, 
   Lock, 
-  Code,
-  Layers
+  Code
 } from 'lucide-react';
 import { KYCForm } from './components/KYCForm';
 import { KYBForm } from './components/KYBForm';
-import { BatchForm } from './components/BatchForm';
 import { ThinkingConsole, Trace } from './components/ThinkingConsole';
 import { AuditList } from './components/AuditList';
 import { CaseType } from './types';
 
-type Tab = CaseType | 'batch' | 'cases';
+type Tab = CaseType | 'cases';
 
 function App() {
   const [activeTab, setActiveTab] = useState<Tab>(CaseType.KYC);
+  const [isLiveMode, setIsLiveMode] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchStatus = async () => {
+      try {
+        const res = await fetch('/api/status');
+        const data = await res.json();
+        if (res.ok) {
+          setIsLiveMode(data.live_mode);
+        }
+      } catch (err) {
+        console.error("Failed to fetch API status", err);
+      }
+    };
+    fetchStatus();
+  }, []);
   const [currentTraces, setCurrentTraces] = useState<Trace[]>([]);
   const [currentHash, setCurrentHash] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
@@ -83,12 +97,11 @@ function App() {
             </div>
             <div>
               <h1 className="text-sm font-bold tracking-tight text-slate-900 flex items-center gap-2">
-                FRAUDCHECK
                 <span className="text-[10px] font-semibold bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full border border-blue-200">
-                  FICA AI COMPLIANCE
+                  Fraudcheck - FICA AI COMPLIANCE
                 </span>
               </h1>
-              <p className="text-[10px] text-slate-500">Automated KYC/KYB Sandbox Engine</p>
+              <p className="text-[10px] text-slate-500">Agentic KYC/KYB Sandbox Engine</p>
             </div>
           </div>
 
@@ -105,6 +118,23 @@ function App() {
           </div>
         </div>
       </header>
+
+      {!isLiveMode && (
+        <div className="bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border-b border-amber-500/20 text-amber-800 px-6 py-2.5 text-xs flex items-center justify-between gap-4 animate-fadeIn">
+          <div className="flex items-center gap-3">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-500 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+            </span>
+            <span>
+              <strong className="font-semibold text-amber-900">Sandbox Mock Mode Active</strong>: No valid <code>GEMINI_API_KEY</code> found in environment. Running offline check emulation.
+            </span>
+          </div>
+          <div className="text-[10px] font-semibold text-amber-600 bg-amber-100/80 px-2 py-0.5 rounded-full border border-amber-200 font-mono tracking-wider">
+            OFFLINE EMULATION
+          </div>
+        </div>
+      )}
 
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-0">
@@ -132,15 +162,6 @@ function App() {
               Corporate KYB
             </button>
             <button
-              onClick={() => setActiveTab('batch')}
-              className={`flex-1 py-2 text-xs font-medium rounded-lg flex items-center justify-center gap-1.5 transition-all ${
-                activeTab === 'batch' ? 'bg-blue-600 text-white shadow-md shadow-blue-200/40' : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <Layers className="w-4 h-4" />
-              Batch KYC
-            </button>
-            <button
               onClick={() => setActiveTab('cases')}
               className={`flex-1 py-2 text-xs font-medium rounded-lg flex items-center justify-center gap-1.5 transition-all ${
                 activeTab === 'cases' ? 'bg-blue-600 text-white shadow-md shadow-blue-200/40' : 'text-slate-600 hover:text-slate-900'
@@ -164,12 +185,6 @@ function App() {
                 onStartVerify={handleStartVerify}
                 onVerificationComplete={handleVerificationComplete}
                 onSelectSubCase={handleSelectSubCase}
-              />
-            )}
-            {activeTab === 'batch' && (
-              <BatchForm
-                onStartVerify={handleStartVerify}
-                onVerificationComplete={handleVerificationComplete}
               />
             )}
             {activeTab === 'cases' && (

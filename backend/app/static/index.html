@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fraudcheck AI FICA Onboarding Dashboard</title>
+    <style>
+        :root {
+            --bg-color: #0d0e12;
+            --panel-bg: rgba(30, 41, 59, 0.3);
+            --card-bg: rgba(30, 41, 59, 0.45);
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --text-main: #f8fafc;
+            --text-mute: #94a3b8;
+            --border: rgba(255, 255, 255, 0.08);
+            --purple-agent: #c084fc;
+            --blue-action: #60a5fa;
+            --green-obs: #34d399;
+            --gold-decision: #fbbf24;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.05) 0px, transparent 50%),
+                radial-gradient(at 50% 50%, rgba(124, 58, 237, 0.05) 0px, transparent 50%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        header {
+            border-b: 1px solid var(--border);
+            background-color: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            padding: 8px;
+            background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .logo-text {
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge-fica {
+            font-size: 10px;
+            font-weight: 600;
+            background-color: rgba(30, 41, 59, 0.8);
+            color: var(--primary);
+            padding: 2px 8px;
+            border-radius: 9999px;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .header-desc {
+            font-size: 10px;
+            color: var(--text-mute);
+            margin-top: 2px;
+        }
+
+        .engine-status {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            font-size: 11px;
+            font-family: monospace;
+            color: var(--text-mute);
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--success);
+            margin-right: 6px;
+            box-shadow: 0 0 8px var(--success);
+        }
+
+        main {
+            flex: 1;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 24px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+
+        @media (min-width: 1024px) {
+            main {
+                grid-template-columns: repeat(12, 1fr);
+            }
+            .left-column {
+                grid-column: span 6;
+            }
+            .right-column {
+                grid-column: span 6;
+            }
+        }
+
+        .tabs-nav {
+            display: flex;
+            padding: 4px;
+            background-color: rgba(15, 23, 42, 0.6);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            color: var(--text-mute);
+            font-size: 12px;
+            font-weight: 500;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+        }
+
+        .tab-btn:hover:not(.active) {
+            color: var(--text-main);
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+
+        .panel-container {
+            background-color: var(--panel-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            min-height: 480px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-main);
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .preset-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .preset-btn {
+            font-size: 10px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background-color: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--border);
+            color: var(--text-mute);
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .preset-btn:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: var(--primary);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 11px;
+            color: var(--text-mute);
+            margin-bottom: 6px;
+        }
+
+        input, select {
+            width: 100%;
+            background-color: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 13px;
+            color: var(--text-main);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary);
+        }
+
+        .avs-container {
+            background-color: rgba(15, 23, 42, 0.3);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .avs-header {
+            font-size: 12px;
+            font-weight: 600;
+            color: #c084fc;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        button.btn-submit {
+            width: 100%;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        button.btn-submit:hover {
+            background-color: var(--primary-hover);
+        }
+
+        button.btn-submit:disabled {
+            background-color: rgba(59, 130, 246, 0.3);
+            color: var(--text-mute);
+            cursor: not-allowed;
+        }
+
+        /* Console styling */
+        .console-container {
+            background-color: rgba(15, 23, 42, 0.45);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .console-header {
+            background-color: rgba(15, 23, 42, 0.7);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 13px;
+        }
+
+        .console-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+
+        .console-hash {
+            font-family: monospace;
+            font-size: 10px;
+            background-color: rgba(30, 41, 59, 0.8);
+            border: 1px solid var(--border);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: var(--text-mute);
+        }
+
+        .console-body {
+            flex: 1;
+            background-color: rgba(9, 10, 14, 0.9);
+            padding: 16px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 11px;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .trace-card {
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .trace-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            font-size: 10px;
+        }
+
+        .trace-THOUGHT {
+            background-color: rgba(192, 132, 252, 0.05);
+            border-color: rgba(192, 132, 252, 0.15);
+        }
+        .header-THOUGHT { color: var(--purple-agent); font-weight: bold; }
+
+        .trace-ACTION {
+            background-color: rgba(96, 165, 250, 0.05);
+            border-color: rgba(96, 165, 250, 0.15);
+        }
+        .header-ACTION { color: var(--blue-action); font-weight: bold; }
+
+        .trace-OBSERVATION {
+            background-color: rgba(52, 211, 153, 0.05);
+            border-color: rgba(52, 211, 153, 0.15);
+        }
+        .header-OBSERVATION { color: var(--green-obs); font-weight: bold; }
+
+        .trace-DECISION {
+            background-color: rgba(251, 191, 36, 0.08);
+            border-color: rgba(251, 191, 36, 0.2);
+        }
+        .header-DECISION { color: var(--gold-decision); font-weight: bold; }
+
+        .console-footer {
+            background-color: rgba(16, 185, 129, 0.05);
+            border-top: 1px solid rgba(16, 185, 129, 0.15);
+            padding: 8px 16px;
+            font-size: 9px;
+            font-family: monospace;
+            color: var(--success);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .console-empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-mute);
+            padding: 40px 0;
+            text-align: center;
+        }
+
+        .console-empty svg {
+            margin-bottom: 12px;
+            opacity: 0.3;
+        }
+
+        /* Ledger Table styles */
+        .ledger-search-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .ledger-list {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            background-color: rgba(15, 23, 42, 0.2);
+            max-height: 380px;
+            overflow-y: auto;
+        }
+
+        .ledger-item {
+            width: 100%;
+            background: none;
+            border: none;
+            text-align: left;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: background-color 0.15s;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .ledger-item:hover {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        .ledger-item.active {
+            background-color: rgba(59, 130, 246, 0.1);
+            border-left: 2px solid var(--primary);
+            padding-left: 14px;
+        }
+
+        .ledger-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .ledger-meta {
+            display: flex;
+            gap: 12px;
+            font-size: 10px;
+            color: var(--text-mute);
+            font-family: monospace;
+        }
+
+        .badge-type {
+            background-color: rgba(30, 41, 59, 0.8);
+            border: 1px solid var(--border);
+            padding: 1px 4px;
+            border-radius: 3px;
+        }
+
+        .ledger-status {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .status-pill {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 9999px;
+            border: 1px solid transparent;
+        }
+
+        .pill-ACCEPT {
+            background-color: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.3);
+            color: var(--success);
+        }
+        .pill-REVIEW {
+            background-color: rgba(245, 158, 11, 0.1);
+            border-color: rgba(245, 158, 11, 0.3);
+            color: var(--warning);
+        }
+        .pill-REJECT {
+            background-color: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: var(--danger);
+        }
+
+        .risk-val {
+            font-family: monospace;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+
+
+        /* KYB Tree structure */
+        .kyb-tree {
+            background-color: rgba(15, 23, 42, 0.2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .tree-node {
+            display: inline-block;
+            background-color: rgba(30, 41, 59, 0.8);
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .tree-children {
+            margin-left: 24px;
+            padding-left: 16px;
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        footer {
+            border-top: 1px solid var(--border);
+            background-color: rgba(9, 10, 14, 0.6);
+            padding: 16px 24px;
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-mute);
+            border-top: 1px solid var(--border);
+            margin-top: 40px;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Spin animation for loaders */
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo-icon">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <div>
+                    <div class="logo-text">
+                        FRAUDCHECK
+                        <span class="badge-fica">FICA AI COMPLIANCE</span>
+                    </div>
+                    <div class="header-desc">Agentic KYC/KYB Engine</div>
+                </div>
+            </div>
+            <div class="engine-status">
+                <span><span class="status-dot"></span>ReAct Loop: ACTIVE</span>
+                <span>🔒 SHA-256 Ledger: ACTIVE</span>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Left Column: Tabs & Forms -->
+        <div class="left-column">
+            <div class="tabs-nav">
+                <button class="tab-btn active" onclick="switchTab('kyc')">
+                    👤 Individual KYC
+                </button>
+                <button class="tab-btn" onclick="switchTab('kyb')">
+                    🏢 Corporate KYB
+                </button>
+                <button class="tab-btn" onclick="switchTab('ledger')">
+                    📜 Audit Ledger
+                </button>
+            </div>
+
+            <!-- Panel 1: KYC Form -->
+            <div id="panel-kyc" class="panel-container">
+                <div class="panel-title">
+                    <span>Individual KYC Verification</span>
+                    <div class="preset-buttons">
+                        <button class="preset-btn" onclick="loadMockKYC('sipho')">Load Sipho (PEP)</button>
+                        <button class="preset-btn" onclick="loadMockKYC('shereen')">Load Shereen (Safe)</button>
+                        <button class="preset-btn" onclick="loadMockKYC('victor')">Load Victor (Alert)</button>
+                    </div>
+                </div>
+                
+                <form id="kyc-form" onsubmit="submitKYC(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>First Names</label>
+                            <input type="text" id="kyc-first" placeholder="e.g. Sipho" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Surname</label>
+                            <input type="text" id="kyc-last" placeholder="e.g. Maseko" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>South African ID Number (13 digits)</label>
+                        <input type="text" id="kyc-id" placeholder="e.g. 9001015000081" maxlength="13" required>
+                    </div>
+                    
+                    <div class="avs-container">
+                        <div class="avs-header">
+                            💳 Real-Time Bank AVS Check
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Bank Name</label>
+                                <select id="kyc-bank">
+                                    <option value="">-- Optional --</option>
+                                    <option value="Standard Bank">Standard Bank</option>
+                                    <option value="First National Bank">First National Bank</option>
+                                    <option value="Nedbank">Nedbank</option>
+                                    <option value="Absa">Absa</option>
+                                    <option value="Capitec">Capitec</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Account Number</label>
+                                <input type="text" id="kyc-account" placeholder="e.g. 1012345678">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="kyc-submit" class="btn-submit">
+                        Perform FICA KYC Audit
+                    </button>
+                </form>
+            </div>
+
+            <!-- Panel 2: KYB Form -->
+            <div id="panel-kyb" class="panel-container" style="display: none;">
+                <div class="panel-title">
+                    <span>Corporate KYB Verification</span>
+                    <div class="preset-buttons">
+                        <button class="preset-btn" onclick="loadMockKYB('apex')">Apex Tech</button>
+                        <button class="preset-btn" onclick="loadMockKYB('vanguard')">Vanguard</button>
+                        <button class="preset-btn" onclick="loadMockKYB('shadow')">Shadow (Sanction)</button>
+                    </div>
+                </div>
+
+                <form id="kyb-form" onsubmit="submitKYB(event)">
+                    <div class="form-group">
+                        <label>Registered Company Name</label>
+                        <input type="text" id="kyb-name" placeholder="e.g. Apex Tech Solutions (Pty) Ltd" required>
+                    </div>
+                    <div class="form-group">
+                        <label>CIPC Registration Number (YYYY/NNNNNN/NN)</label>
+                        <input type="text" id="kyb-reg" placeholder="e.g. 2021/100200/07" required>
+                    </div>
+
+                    <button type="submit" id="kyb-submit" class="btn-submit">
+                        Launch KYB Entity Audit
+                    </button>
+                </form>
+
+                <div id="kyb-tree-container" class="kyb-tree" style="display: none;">
+                    <div style="font-size: 11px; font-weight: 600; color: #a78bfa; margin-bottom: 12px;">
+                        Beneficial Ownership structure (UBO Hierarchy)
+                    </div>
+                    <div class="tree-node" id="tree-company-node">🏢 Company (Active)</div>
+                    <div class="tree-children" id="tree-directors-list">
+                        <!-- Filled dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel 3: Ledger Transactions -->
+            <div id="panel-ledger" class="panel-container" style="display: none;">
+                <div class="panel-title">Compliance Audit Ledger</div>
+                <div class="ledger-search-row">
+                    <input type="text" id="ledger-search" placeholder="Search logs by name or transaction ID..." oninput="filterLedger()">
+                </div>
+                <div class="ledger-list" id="ledger-items-container">
+                    <!-- Filled dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Agent Console -->
+        <div class="right-column">
+            <div class="console-container">
+                <div class="console-header">
+                    <div class="console-title">
+                        <span style="color: var(--purple-agent); font-weight: bold;">🤖</span>
+                        <span>FICA Agent Reasoning Telemetry</span>
+                    </div>
+                    <span class="console-hash" id="console-hash-val">No lock</span>
+                </div>
+                <div class="console-body" id="console-output">
+                    <div class="console-empty" id="console-empty-el">
+                        <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 17h6M9 13h6M9 9h3"/></svg>
+                        <p>Console Idle. Awaiting compliance check...</p>
+                    </div>
+                </div>
+                <div class="console-footer" id="console-footer-el" style="display: none;">
+                    <span>AUDITABLE SANDBOX LOCK</span>
+                    <span id="console-signature-val">Hash signature</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <span>Zero-Dependency SQLite ORM • ReAct Execution Sandbox</span>
+            <span>Built for Fraudcheck FICA Compliance Platform</span>
+        </div>
+    </footer>
+
+    <script>
+        // State variables
+        let activeTab = 'kyc';
+        let currentTraces = [];
+        let simulationInterval = null;
+
+        // Tab switcher
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.panel-container').forEach(panel => panel.style.display = 'none');
+            
+            const selectedBtn = Array.from(document.querySelectorAll('.tab-btn')).find(btn => btn.textContent.includes(tabName === 'kyc' ? 'KYC' : tabName === 'kyb' ? 'KYB' : 'Ledger'));
+            if (selectedBtn) selectedBtn.classList.add('active');
+            
+            document.getElementById(`panel-${tabName}`).style.display = 'flex';
+            activeTab = tabName;
+
+            if (tabName === 'ledger') {
+                loadLedger();
+            }
+        }
+
+        // Preset Loaders
+        function loadMockKYC(preset) {
+            const mocks = {
+                sipho: { first: 'Sipho', last: 'Maseko', id: '9001015000081', bank: 'Standard Bank', acc: '1012345678' },
+                shereen: { first: 'Shereen', last: 'Naidoo', id: '8507155123084', bank: 'First National Bank', acc: '9087654321' },
+                victor: { first: 'Victor', last: 'Sanctioned', id: '6001015000080', bank: 'Nedbank', acc: '5566778899' }
+            };
+            const mock = mocks[preset];
+            document.getElementById('kyc-first').value = mock.first;
+            document.getElementById('kyc-last').value = mock.last;
+            document.getElementById('kyc-id').value = mock.id;
+            document.getElementById('kyc-bank').value = mock.bank;
+            document.getElementById('kyc-account').value = mock.acc;
+        }
+
+        function loadMockKYB(preset) {
+            const mocks = {
+                apex: { name: 'Apex Tech Solutions (Pty) Ltd', reg: '2021/100200/07' },
+                vanguard: { name: 'Vanguard Enterprises (Pty) Ltd', reg: '2018/345678/07' },
+                shadow: { name: 'Shadow Logistics (Pty) Ltd', reg: '2020/999999/07' }
+            };
+            const mock = mocks[preset];
+            document.getElementById('kyb-name').value = mock.name;
+            document.getElementById('kyb-reg').value = mock.reg;
+        }
+
+        // Submissions
+        async function submitKYC(e) {
+            e.preventDefault();
+            const btn = document.getElementById('kyc-submit');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Running Agent Compliance Audit...';
+            
+            const payload = {
+                first_names: document.getElementById('kyc-first').value,
+                last_name: document.getElementById('kyc-last').value,
+                id_number: document.getElementById('kyc-id').value,
+                bank_name: document.getElementById('kyc-bank').value,
+                account_number: document.getElementById('kyc-account').value
+            };
+
+            try {
+                const res = await fetch('/api/kyc', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await res.json();
+                
+                if (!res.ok) throw new Error(result.message);
+
+                // Fetch trace details
+                const auditRes = await fetch(`/api/transactions/${result.id}/audit`);
+                const audit = await auditRes.json();
+                
+                simulateAgentSteps(audit.traces, result.sandbox_hash);
+            } catch (err) {
+                alert("Error during audit: " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Perform FICA KYC Audit';
+            }
+        }
+
+        async function submitKYB(e) {
+            e.preventDefault();
+            const btn = document.getElementById('kyb-submit');
+            const treeContainer = document.getElementById('kyb-tree-container');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Analyzing Corporate Registration...';
+            treeContainer.style.display = 'none';
+
+            const payload = {
+                company_name: document.getElementById('kyb-name').value,
+                registration_number: document.getElementById('kyb-reg').value
+            };
+
+            try {
+                const res = await fetch('/api/kyb', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await res.json();
+
+                if (!res.ok) throw new Error(result.message);
+
+                // Fetch trace details
+                const auditRes = await fetch(`/api/transactions/${result.id}/audit`);
+                const audit = await auditRes.json();
+
+                simulateAgentSteps(audit.traces, result.sandbox_hash);
+
+                // Render CIPC beneficial owners tree
+                // Let's query corporate data from mock API to see directors details
+                const dbRes = await fetch('/api/transactions');
+                const dbData = await dbRes.json();
+                
+                // CIPC Mock directors rendering
+                document.getElementById('tree-company-node').innerHTML = '🏢 ' + result.target_name + ' (' + result.status + ')';
+                
+                let dirHtml = '';
+                // Add mock directors depending on registry presets
+                if (payload.registration_number.includes('100200')) {
+                    dirHtml += '<div class="tree-node">👤 Sipho Maseko (Director - 60% UBO)</div>';
+                    dirHtml += '<div class="tree-node">👤 Shereen Naidoo (Director - 40% UBO)</div>';
+                } else if (payload.registration_number.includes('345678')) {
+                    dirHtml += '<div class="tree-node">👤 Johan Pretorius (Managing Director - 100% UBO)</div>';
+                } else {
+                    dirHtml += '<div class="tree-node" style="border-color: var(--danger); color: var(--danger)">👤 Victor Sanctioned (Director - 100% UBO - SANCTIONED WARNING)</div>';
+                }
+                
+                document.getElementById('tree-directors-list').innerHTML = dirHtml;
+                treeContainer.style.display = 'block';
+
+            } catch (err) {
+                alert("Error during KYB audit: " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Launch KYB Entity Audit';
+            }
+        }
+
+        // Telemetry simulator (typer effect for agent steps)
+        function simulateAgentSteps(traces, signature) {
+            const consoleOutput = document.getElementById('console-output');
+            const emptyEl = document.getElementById('console-empty-el');
+            if (emptyEl) emptyEl.remove();
+
+            consoleOutput.innerHTML = '';
+            document.getElementById('console-hash-val').textContent = 'Generating lock...';
+            document.getElementById('console-footer-el').style.display = 'none';
+
+            if (simulationInterval) clearInterval(simulationInterval);
+            
+            let i = 0;
+            function addStep() {
+                if (i >= traces.length) {
+                    clearInterval(simulationInterval);
+                    document.getElementById('console-hash-val').textContent = 'LOCKED';
+                    document.getElementById('console-signature-val').textContent = signature;
+                    document.getElementById('console-footer-el').style.display = 'flex';
+                    return;
+                }
+
+                const trace = traces[i];
+                const card = document.createElement('div');
+                card.className = `trace-card trace-${trace.step_type}`;
+                
+                let label = '';
+                if (trace.step_type === 'THOUGHT') label = 'Thought Process';
+                if (trace.step_type === 'ACTION') label = 'Tool Invocation';
+                if (trace.step_type === 'OBSERVATION') label = 'System Observation';
+                if (trace.step_type === 'DECISION') label = 'Audit Recommendation';
+
+                card.innerHTML = `
+                    <div class="trace-header">
+                        <span class="header-${trace.step_type}">Step ${trace.step_index}: ${label}</span>
+                        <span>${trace.step_type}</span>
+                    </div>
+                    <p style="color: #cbd5e1; font-size: 11px;">${trace.content}</p>
+                `;
+
+                consoleOutput.appendChild(card);
+                consoleOutput.scrollTop = consoleOutput.scrollHeight;
+                i++;
+            }
+
+            addStep();
+            simulationInterval = setInterval(addStep, 1000);
+        }
+
+        // Ledger list loaders
+        async function loadLedger() {
+            const container = document.getElementById('ledger-items-container');
+            container.innerHTML = '<div style="padding: 24px; text-align: center; color: var(--text-mute);">Loading records...</div>';
+
+            try {
+                const res = await fetch('/api/transactions');
+                const txs = await res.json();
+                
+                if (txs.length === 0) {
+                    container.innerHTML = '<div style="padding: 32px; text-align: center; color: var(--text-mute);">No transactions recorded.</div>';
+                    return;
+                }
+
+                let html = '';
+                txs.forEach(tx => {
+                    const date = new Date(tx.timestamp).toLocaleString();
+                    html += `
+                        <button class="ledger-item" onclick="viewAudit('${tx.id}')" id="ledger-btn-${tx.id}">
+                            <div class="ledger-info">
+                                <div class="ledger-meta">
+                                    <span class="badge-type">${tx.type}</span>
+                                    <span>ID: ${tx.id}</span>
+                                </div>
+                                <div style="font-size: 13px; font-weight: 600; margin-top: 4px;">${tx.target_name}</div>
+                                <div style="font-size: 9px; color: var(--text-mute); margin-top: 4px;">
+                                    ⏰ ${date} • 🔒 Hash: ${tx.sandbox_hash.slice(0, 12)}...
+                                </div>
+                            </div>
+                            <div class="ledger-status">
+                                <div style="text-align: right;">
+                                    <div style="font-size: 9px; color: var(--text-mute); margin-bottom: 2px;">Risk</div>
+                                    <span class="risk-val ${tx.risk_score > 60 ? 'header-DECISION' : 'header-OBSERVATION'}">${tx.risk_score}/100</span>
+                                </div>
+                                <span class="status-pill pill-${tx.status}">${tx.status}</span>
+                            </div>
+                        </button>
+                    `;
+                });
+                container.innerHTML = html;
+            } catch (err) {
+                container.innerHTML = '<div style="padding: 24px; text-align: center; color: var(--danger);">Failed to load ledger database.</div>';
+            }
+        }
+
+        async function viewAudit(txId) {
+            document.querySelectorAll('.ledger-item').forEach(item => item.classList.remove('active'));
+            const activeBtn = document.getElementById(`ledger-btn-${txId}`);
+            if (activeBtn) activeBtn.classList.add('active');
+
+            try {
+                const res = await fetch(`/api/transactions/${txId}/audit`);
+                const data = await res.json();
+                
+                // Immediately display all steps for history (no simulated streaming delay)
+                const consoleOutput = document.getElementById('console-output');
+                const emptyEl = document.getElementById('console-empty-el');
+                if (emptyEl) emptyEl.remove();
+
+                if (simulationInterval) clearInterval(simulationInterval);
+
+                consoleOutput.innerHTML = '';
+                data.traces.forEach(trace => {
+                    const card = document.createElement('div');
+                    card.className = `trace-card trace-${trace.step_type}`;
+                    
+                    let label = '';
+                    if (trace.step_type === 'THOUGHT') label = 'Thought Process';
+                    if (trace.step_type === 'ACTION') label = 'Tool Invocation';
+                    if (trace.step_type === 'OBSERVATION') label = 'System Observation';
+                    if (trace.step_type === 'DECISION') label = 'Audit Recommendation';
+
+                    card.innerHTML = `
+                        <div class="trace-header">
+                            <span class="header-${trace.step_type}">Step ${trace.step_index}: ${label}</span>
+                            <span>${trace.step_type}</span>
+                        </div>
+                        <p style="color: #cbd5e1; font-size: 11px;">${trace.content}</p>
+                    `;
+                    consoleOutput.appendChild(card);
+                });
+                
+                consoleOutput.scrollTop = consoleOutput.scrollHeight;
+                document.getElementById('console-hash-val').textContent = 'LOCKED';
+                document.getElementById('console-signature-val').textContent = data.sandbox_hash;
+                document.getElementById('console-footer-el').style.display = 'flex';
+
+            } catch (err) {
+                alert("Failed to fetch historical audit: " + err.message);
+            }
+        }
+    </script>
+</body>
+</html>

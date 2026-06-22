@@ -15,15 +15,3 @@ export enum StepType {
   OBSERVATION = 'OBSERVATION',
   DECISION = 'DECISION'
 }
-
-export interface BatchItem {
-  id?: string;
-  first_names: string;
-  last_name: string;
-  id_number: string;
-  bank_name?: string;
-  account_number?: string;
-  status?: AuditStatus;
-  risk_score?: number;
-  error?: string;
-}

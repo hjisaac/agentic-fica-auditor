@@ -78,21 +78,21 @@ export const AuditList: React.FC<AuditListProps> = ({ onSelectAudit, selectedTxI
     switch (status) {
       case AuditStatus.ACCEPT:
         return (
-          <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-250 text-emerald-700 text-xs">
+          <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs">
             <Shield className="w-3.5 h-3.5 text-emerald-600" />
             ACCEPT
           </span>
         );
       case AuditStatus.REVIEW:
         return (
-          <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 border border-amber-250 text-amber-700 text-xs">
+          <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-700 text-xs">
             <Clock className="w-3.5 h-3.5 text-amber-600" />
             REVIEW
           </span>
         );
       case AuditStatus.REJECT:
         return (
-          <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-50 border border-red-250 text-red-700 text-xs">
+          <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-50 border border-red-200 text-red-700 text-xs">
             <ShieldAlert className="w-3.5 h-3.5 text-red-600" />
             REJECT
           </span>
