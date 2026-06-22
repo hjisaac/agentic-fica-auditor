@@ -41,7 +41,7 @@ Instead of writing rigid, hardcoded scripts for compliance verification, this pl
 *   **Backend**: FastAPI + Uvicorn (high-performance async web server).
 *   **Database & ORM**: SQLite + Peewee ORM (Active Record pattern).
 *   **Frontend**: React + Tailwind CSS (visualizes live agent thoughts, corporate trees, and generates client-side PDF audit reports).
-*   **Deployment**: Fully containerized with a multi-stage Dockerfile and ready for one-click deployment on Render.
+*   **Deployment**: [NEEFIX] Fully containerized with a multi-stage Dockerfile and ready for one-click deployment on Render.
 
 ---
 
