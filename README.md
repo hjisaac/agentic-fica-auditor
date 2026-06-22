@@ -1,10 +1,10 @@
-# FICA Compliance KYC & KYB AI Agent (~Prototype)
+# FICA Compliance KYC & KYB AI Agent 
 
-A personal weekend project designed to demonstrate **Agentic AI patterns** in regulatory compliance checks under South Africa's **FICA (Financial Intelligence Centre Act)**. Built as a technical showcase for **Fraudcheck**.
+A personal weekend project designed to demonstrate **Agentic AI patterns** in regulatory compliance checks under South Africa's **FICA (Financial Intelligence Centre Act)**. Built as a technical showcase for **Fraudcheck**. 
 
 ---
 
-## 🎯 Project Goal & Context
+## Project Goal & Context
 
 The goal of this prototype is to show how autonomous reasoning agents can streamline multi-step, complex compliance audits. 
 
@@ -15,16 +15,16 @@ Instead of writing rigid, hardcoded scripts for compliance verification, this pl
 
 ---
 
-## 🧠 Agentic Patterns Demonstrated
+## Agentic Patterns Demonstrated
 
 1.  **Autonomous ReAct Loop**: The agent loops through `Thought -> Action -> Observation -> Decision` to collect audit data.
 2.  **Tool-Use Abstraction**: The agent has access to specialized tools (PEP screening, DHA checks, adverse media, CIPC lookups). If it's auditing a business (KYB), it maps the director tree from CIPC and recursively audits all directors.
-3.  **Sandbox Isolation & Verification Ledger**: Ephemeral contexts capture case execution logs and sign the final results with a **SHA-256 cryptographic hash** to prevent compliance tampering.
+3.  **Sandbox Isolation & Verification Ledger**: Ephemeral contexts utilize [Bubblewrap](https://github.com/containers/bubblewrap) (low-level Linux sandboxing) and new chat sessions for complete sandbox isolation. It captures case execution logs and signs the final results with a **SHA-256 cryptographic hash** to prevent compliance tampering.
 4.  **Resilient Hybrid Fallback**: If live AI services (Gemini API) experience rate limits (e.g., 429 quota exhaustion) or network errors, the engine falls back to local compliance sandboxes and highlights the error in the telemetry terminal as a prominent warning alert.
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 *   **AI Engine**: Google Gemini API + custom ReAct reasoning parser.
 *   **Backend**: FastAPI + Uvicorn (high-performance async web server).
@@ -34,18 +34,29 @@ Instead of writing rigid, hardcoded scripts for compliance verification, this pl
 
 ---
 
-## 🚀 Quick Start (Local Run)
+## Quick Start (Local Run)
 
-The project is natively configured for **`uv`**, the modern Rust-based python package manager.
+Since the frontend build directory (`frontend/dist/`) is gitignored, you must compile the React assets first, then start the FastAPI backend.
 
+### 1. Build the Frontend
+Requires Node.js and `pnpm`:
 ```bash
-# Run backend & serve frontend
+cd frontend
+pnpm install
+pnpm run build
+cd ..
+```
+
+### 2. Run the Backend & Server
+The project backend is natively configured for **`uv`**, the modern Rust-based Python package manager. **`uv run` automatically initializes the virtual environment and synchronizes all Python dependencies on the fly:**
+```bash
 uv run backend/run.py
 ```
-This command automatically sets up the python virtual environment, installs dependencies, initializes and seeds the database, and hosts the dashboard on **http://localhost:8080**.
+
+Once the server has initialized, open **http://localhost:8080** in your browser to view the interactive FICA dashboard.
 
 ---
 
-## 📦 Production Deployment (Render)
+## Production Deployment (Render)
 
 A `render.yaml` blueprint is included. Connect this repository to your **Render.com** account, create a **Blueprint Instance**, and Render will deploy the Docker container automatically.
