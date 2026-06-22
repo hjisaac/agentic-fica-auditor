@@ -6,7 +6,7 @@ A personal weekend project designed to demonstrate **Agentic AI patterns** in re
 
 Here is a short demonstration of the FICA Compliance Agent in action, showing live agent thoughts, dynamic corporate director trees, and PDF report generation:
 
-<video src="demo.webm" width="100%" controls></video>
+[Watch the Demo Video](demo.webm)
 
 ---
 
