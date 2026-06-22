@@ -1,7 +1,7 @@
 services:
   - type: web
-    name: fc-fica-compliance-agent
+    name: agentic-fica-auditor
     env: docker
-    dockerFilePath: Dockerfile
+    dockerfilePath: Dockerfile
     plan: free
     healthCheckPath: /api/cases
