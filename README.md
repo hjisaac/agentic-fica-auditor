@@ -1,96 +1,54 @@
-# FICA Compliance KYC & KYB AI Agent 
+# Agentic FICA Compliance Auditor
 
-A personal weekend project designed to demonstrate **Agentic AI patterns** in regulatory compliance checks under South Africa's **FICA (Financial Intelligence Centre Act)**. Built as a technical showcase for **Fraudcheck**. 
+An autonomous compliance verification platform implementing agentic AI patterns for South Africa's Financial Intelligence Centre Act (FICA) regulations. It automates multi-step KYC (individual) and KYB (corporate) compliance audits with tamper-evident audit trails.
 
-## Demo Video
+## Key Features
 
-Here is a short demonstration of the FICA Compliance Agent in action, showing live agent thoughts, dynamic corporate director trees, and PDF report generation:
+- **Autonomous ReAct Loop**: Coordinates compliance verification via iterative Reasoning and Action (`Thought -> Action -> Observation -> Decision`).
+- **Tool-Use Abstraction**: Calls specialized verification services including DHA identity validation, CIPC corporate registry lookups with recursive director audits, PEP and sanctions screening, bank account verification, and adverse media checks.
+- **Tamper-Evident Ledger**: Captures chronological reasoning traces and signs final compliance records with a SHA-256 cryptographic hash.
+- **Hybrid Execution**: Runs dynamic agent reasoning with the Google Gemini API when `GEMINI_API_KEY` is present, or falls back to deterministic local mock verification without external API dependencies.
+- **Unified Frontend**: React dashboard visualizing agent thought streams, corporate ownership hierarchies, and exportable PDF audit reports.
 
-[Watch the Demo Video](demo.webm)
+## Architecture & Tech Stack
 
----
+- **Backend**: FastAPI, Uvicorn, Peewee ORM, SQLite
+- **AI & Reasoning**: Google Gemini API via `google-genai` SDK with custom ReAct orchestrator
+- **Frontend**: React 18, Vite, Tailwind CSS, jsPDF
+- **Packaging & Deployment**: Multi-stage Docker container, Render Blueprint (`render.yaml`)
 
-## Project Goal & Context
+## Quick Start
 
-The goal of this prototype is to show how autonomous reasoning agents can streamline multi-step, complex compliance audits. 
+### Using Docker
 
-Instead of writing rigid, hardcoded scripts for compliance verification, this platform uses a **ReAct (Reasoning and Action) loop** where the agent autonomously decides what verification tools to call, inspects their results, and builds a comprehensive audit recommendation.
+```bash
+docker build -t fica-auditor .
+docker run -p 8080:8080 -e PORT=8080 fica-auditor
+```
+Access the application at `http://localhost:8080`.
 
-> [!NOTE]
-> **Mocked Endpoints & Swappable Tools**: To run fully out-of-the-box without requiring restricted or expensive government API credentials, all external verification tools (DHA citizen registry, CIPC corporate business lookup, bank account verification, sanctions lists) query local, mocked databases. The tool interfaces are fully defined and can be easily replaced with live production REST API endpoints.
+### Local Setup
 
-> [!TIP]
-> **Offline/Mock vs. Live Agent Modes**: The engine automatically checks your Gemini API key validity on startup using a token-free metadata ping.
-> * **Offline/Mock Mode (Default)**: If no `GEMINI_API_KEY` is provided (or if the key is invalid), the engine automatically falls back to offline mode. It executes using deterministic, pre-seeded local mock verification traces, making it completely free, fast, and token-free to test.
-> * **Live Agentic Mode**: If a valid `GEMINI_API_KEY` is configured (via your environment or `.env` file), the engine utilizes the Google Gemini API to run dynamic, autonomous ReAct loops.
-
----
-
-## Agentic Patterns Demonstrated
-
-1.  **Autonomous ReAct Loop**: The agent loops through `Thought -> Action -> Observation -> Decision` to collect audit data.
-2.  **Tool-Use Abstraction**: The agent has access to specialized tools (PEP screening, DHA checks, adverse media, CIPC lookups). If it's auditing a business (KYB), it maps the director tree from CIPC and recursively audits all directors.
-3.  **Sandbox Isolation & Verification Ledger**: Ephemeral contexts utilize [Bubblewrap](https://github.com/containers/bubblewrap) (low-level Linux sandboxing) and new chat sessions for complete sandbox isolation. It captures case execution logs and signs the final results with a **SHA-256 cryptographic hash** to prevent compliance tampering.
-4.  **Resilient Hybrid Fallback**: If live AI services (Gemini API) experience rate limits (e.g., 429 quota exhaustion) or network errors, the engine falls back to local compliance sandboxes and highlights the error in the telemetry terminal as a prominent warning alert.
-
----
-
-## Tech Stack
-
-*   **AI Engine**: Google Gemini API + custom ReAct reasoning parser.
-*   **Backend**: FastAPI + Uvicorn (high-performance async web server).
-*   **Database & ORM**: SQLite + Peewee ORM (Active Record pattern).
-*   **Frontend**: React + Tailwind CSS (visualizes live agent thoughts, corporate trees, and generates client-side PDF audit reports).
-*   **Deployment**: [NEEDFIX] Fully containerized with a multi-stage Dockerfile and ready for one-click deployment on Render.
-
----
-
-## Quick Start (Local Run)
-
-There are two ways to run the project locally. 
-
-> [!NOTE]
-> **No Separate Frontend Server Required**: By default, the FastAPI backend is configured to serve the compiled static React build automatically. You do not need to run a separate server for the frontend.
-
-### Option A: Standalone Setup (Recommended)
-This compiles the React assets and lets the FastAPI backend serve them directly on **http://localhost:8080**.
-
-1. **Build the Frontend**:
-   Requires Node.js and `pnpm`:
+1. **Build Frontend**:
    ```bash
    cd frontend
-   pnpm install
-   pnpm run build
+   pnpm install && pnpm run build
    cd ..
    ```
 
-2. **Run the Server**:
-   The project backend is natively configured for **`uv`**, the modern Rust-based Python package manager. `uv run` automatically sets up the environment and synchronizes dependencies:
+2. **Run Backend**:
    ```bash
    uv run backend/run.py
    ```
-   Once initialized, open **http://localhost:8080** in your browser to view the dashboard.
+   The backend serves both the API and compiled frontend assets at `http://localhost:8080`.
 
-### Option B: Active Development Setup (Dual-Server)
-If you want to modify the frontend code and see changes in real-time with hot-reloading, you can run Vite's development server alongside the backend.
+### Configuration
 
-1. **Start the Backend**:
-   ```bash
-   uv run backend/run.py
-   ```
-   The backend API will run on **http://localhost:8080**.
+Optional environment variables:
 
-2. **Start the Frontend Dev Server**:
-   In a new terminal window:
-   ```bash
-   cd frontend
-   pnpm install
-   pnpm run dev
-   ```
-   Vite runs on **http://localhost:3000** and automatically proxies `/api` requests to the FastAPI backend. Open **http://localhost:3000** in your browser.
+- `GEMINI_API_KEY`: API key for live Gemini agent reasoning. If omitted, the engine automatically operates in offline mock mode.
+- `PORT`: Server port (defaults to `8080`, dynamically bound by hosting platforms).
 
----
+## Deployment
 
-## Production Deployment (Render)
-
-A `render.yaml` blueprint is included. Connect this repository to your **Render.com** account, create a **Blueprint Instance**, and Render will deploy the Docker container automatically.
+A `render.yaml` blueprint is included for deployment on Render as a containerized web service.
