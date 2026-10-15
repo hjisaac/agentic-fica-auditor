@@ -11,7 +11,7 @@ logger = logging.getLogger("fc_agent")
 router = APIRouter(prefix="/api")
 agent_engine = ComplianceAgentEngine()
 
-@router.get("/status")
+@router.api_route("/status", methods=["GET", "HEAD"])
 async def get_status():
     """Retrieve backend configurations and Gemini API connection status."""
     from backend.app.agent.engine import IS_GEMINI_KEY_VALID
@@ -58,7 +58,7 @@ async def run_kyb(payload: KYBRequest):
         logger.exception("FICA KYB Agent execution failed.")
         raise HTTPException(status_code=500, detail=f"Agent loop failed: {str(e)}")
 
-@router.get("/cases")
+@router.api_route("/cases", methods=["GET", "HEAD"])
 async def get_cases():
     """Retrieve all case compliance logs."""
     try:

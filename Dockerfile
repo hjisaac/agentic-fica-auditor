@@ -21,13 +21,12 @@ RUN pnpm run build
 # ==========================================
 # STAGE 2: Build the Python FastAPI Backend
 # ==========================================
-FROM python:3.10-slim
+FROM python:3.11-slim
 WORKDIR /app
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
-    build-essential \
     && rm -rf /var/lib/apt/lists/*
 
 # Install uv (modern python package manager)
@@ -41,18 +40,21 @@ COPY pyproject.toml ./
 # Sync python environment using uv (creates .venv)
 RUN uv venv && uv pip install .
 
+# Activate virtualenv
+ENV PATH="/app/.venv/bin:${PATH}"
+
 # Copy backend application source
 COPY backend ./backend
 
 # Copy the compiled static React build from STAGE 1 into the backend's static directory
 COPY --from=frontend-builder /frontend/dist ./frontend/dist
 
-# Expose port 8080 for Uvicorn
+# Expose port (default 8080, overridden by $PORT on Render)
 EXPOSE 8080
 
 # Environment variables
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONPATH="."
 
-# Run the FastAPI server via uv using the uvicorn script
-CMD ["uv", "run", "backend/run.py"]
+# Run the FastAPI server via Python
+CMD ["python", "backend/run.py"]

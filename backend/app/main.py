@@ -24,7 +24,7 @@ app.include_router(api_router)
 # Serve static frontend files with correct routing
 react_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../frontend/dist'))
 
-@app.get("/{path:path}")
+@app.api_route("/{path:path}", methods=["GET", "HEAD"])
 async def serve_static(path: str):
     if not os.path.exists(react_dir):
         raise HTTPException(
